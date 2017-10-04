@@ -1,6 +1,15 @@
+//setup Canvas
+var canvas = document.createElement('canvas');
+var context = canvas.getContext("2d");
 
+
+var cell = null;
+var bacteria = []; 
+
+
+var phagocyteAnimation = {
 //general bacteria object
-function bacteria(source)
+bacteria: function (source)
 {
 	this.img = new Image();
 	this.img.src = source;
@@ -15,10 +24,10 @@ function bacteria(source)
 	this.starty;
 	this.startx;
 	this.cap = false;
-}
+},
 
 //general sprite object
-function sprite(source)
+sprite: function (source)
 {
 	this.img = new Image();
 	this.img.src = source;
@@ -28,30 +37,26 @@ function sprite(source)
 	this.dx = 1;
 	this.vx = 0;
 	this.vy = 0;
-}
+},
 
-//setup Canvas
-var canvas = document.createElement('canvas');
-var context = canvas.getContext("2d");
+
+
+//setup and start the animation
+ init: function()
+{
+
 
 	
 //load Sprites
-var cell = new sprite("phagocyte1.png");
+ cell = new phagocyteAnimation.sprite("phagocyte1.png");
 
 
-
-var bacteria = []; 
 for(var i = 0; i < 25; i ++)
 {
 	
-	bacteria.push(new sprite("bac.png"));
+	bacteria.push(new phagocyteAnimation.sprite("bac.png"));
 	
 }
-
-//setup and start the animation
- function init()
-{
-	
 	//get window height and width 
 	var height;
 	var width;
@@ -87,18 +92,18 @@ for(var i = 0; i < 25; i ++)
 		bacteria[i].startx = bacteria[i].x;
 		bacteria[i].starty = bacteria[i].y;
 	}
-setInterval(animation,1000/70);
-}
-function cellBorder()
+setInterval(phagocyteAnimation.animation,1000/70);
+},
+cellBorder: function ()
 {
 
 	var num = Math.floor(Math.random() * (5) + 1) ;
 	cell.img.src = "phagocyte" + num + ".png";
 
 
-}	
+},	
 
-function draw()
+draw: function ()
 {
 
 	context.clearRect(0,0, canvas.width, canvas.height);
@@ -108,10 +113,10 @@ function draw()
 		context.drawImage(bacteria[i].img, bacteria[i].x , bacteria[i].y);
 		
 	
-}
+},
 
 //find closest bacteria to the cell
-function closestBacteria()
+closestBacteria: function ()
 {
 	
 	var bacTemp = bacteria[0];
@@ -130,26 +135,26 @@ function closestBacteria()
 		}
 	}
 	if(bacteria[0] == null)
-		reset();
+		phagocyteAnimation.reset();
 	return bacTemp;
-}
+},
 
 //generate new bacteria for consumption by phagocite
-function reset()
+reset: function ()
 {
 	
 	for(var i = 0; i < 50; i ++)
 	{
-		bacteria.push(new sprite("bac.png"));
+		bacteria.push(new phagocyteAnimation.sprite("bac.png"));
 		bacteria[i].x = Math.floor(Math.random() * ((canvas.width - 400) + 200)) ;
 		bacteria[i].y = Math.floor(Math.random() * ((canvas.height - 400) + 200)) ;
 		bacteria[i].startx = bacteria[i].x;
 		bacteria[i].starty = bacteria[i].y;
 	}
-}
+},
 
 //simulates digestion after screen cleared of bacteria
-function removeBacteria()
+removeBacteria: function ()
 {
 	if(bacteria[0] == null)
 		reset();
@@ -164,14 +169,15 @@ function removeBacteria()
 	if(allCaptured)
 		bacteria.pop();
 	
-}
-function collision(obj1, obj2)
+},
+ collision: function(obj1, obj2)
 {
 	return (obj1.x < obj2.x + obj2.img.width-3  && obj1.x + obj1.img.width-3  > obj2.x &&
-		obj1.y < obj2.y + obj2.img.height-3 && obj1.y + obj1.img.height-3 > obj2.y)}
-function update()
+		obj1.y < obj2.y + obj2.img.height-3 && obj1.y + obj1.img.height-3 > obj2.y)
+		},
+update: function ()
 {
-	cellBorder();
+	this.cellBorder();
 	
 	if(cell.x >= canvas.width *.84)
 	{
@@ -196,7 +202,7 @@ function update()
 	}
 	
 	//move in direction of closest bacteria
-	var closestBac = closestBacteria();
+	var closestBac = phagocyteAnimation.closestBacteria();
 	if(!closestBac.cap)
 	{
 		var xDifference = closestBac.x - cell.x;
@@ -260,7 +266,7 @@ function update()
 			bacteria[i].y =  cell.y + yMultiplyer;
 		}
 	
-		else if(collision(cell, bacteria[i])){bacteria[i].cap = true;}
+		else if(this.collision(cell, bacteria[i])){bacteria[i].cap = true;}
 	
 		else 
 		{
@@ -269,11 +275,12 @@ function update()
 		}
 	
 	}
-}
+},
 	
-function animation()
+animation: function ()
 {
-	update();
-	draw();
-	removeBacteria();
+	phagocyteAnimation.update();
+	phagocyteAnimation.draw();
+	phagocyteAnimation.removeBacteria();
 }
+};
